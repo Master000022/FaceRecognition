@@ -30,7 +30,7 @@ class Table(tk.Frame):
         scrolltable.pack(side=tk.RIGHT, fill=tk.Y)
         table.pack(expand=tk.YES, fill=tk.BOTH)
 
-def update():
+def update(self):
     global root, table, conn1, cur1, data
     conn1 = sqlite3.connect('Main_base.db')
     cur1 = conn1.cursor()
@@ -39,7 +39,7 @@ def update():
     conn1.commit()
     table = Table(root, headings=('Userid', 'Username', 'Status', 'Date'), rows=data)
     # table.pack(expand=tk.YES, fill=tk.BOTH)
-    ttk.Treeview.insert('', tk.END, values=tuple(data))
+    self.Treeview.insert(parent='', index = tk.END, values=tuple(data))
     print("check")
     root.after(1000, update)
 

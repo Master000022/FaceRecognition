@@ -3,6 +3,11 @@ import sqlite3
 import cv2
 import face_recognition
 import datetime
+# from Main.py import check
+#
+# val1 = os.getpid()
+# print(val1)
+
 
 conn1 = sqlite3.connect('Main_base.db')  # Создание основной БД
 cur1 = conn1.cursor()
@@ -23,9 +28,9 @@ cur.execute("CREATE TABLE IF NOT EXISTS users(userid INT,"
             " name TEXT, status TEXT, date dat);")
 conn.commit()
 
-cur.execute("DELETE FROM users WHERE name='Alexander' "
-            "or name = 'Dark' or name='beast';")  # удаление значений из вспомогательной БД
-conn.commit()
+# cur.execute("DELETE FROM users WHERE name='Alexander' "
+#             "or name = 'Dark' or name='beast';")  # удаление значений из вспомогательной БД
+# conn.commit()
 
 # cur.execute("SELECT * FROM users;")  # проверка остаточных значений в вспомогательной БД
 # one_result = cur.fetchall()
@@ -43,12 +48,14 @@ def encode(image):
     # print("image:")
     # print(image)
     # print(face_recognition.face_encodings(image))
-    return face_recognition.face_encodings(image, None, 1, "large")[0]
-
+    if not face_recognition.face_encodings(image, None, 5, "large"):
+        return [0]
+    return face_recognition.face_encodings(image, None, 5, "large")[0]
 
 path1 = None
 known_face_encodings = []  # кодировки изображений
 known_face_names = []  # имена к кодировкам
+Labels_and_pathes = ['first']
 label = str()
 # print(known_face_encodings)
 # print(known_face_names)
@@ -61,11 +68,20 @@ for root, dirs, files in os.walk(image_dir):
         # print(file)
         if file.endswith("jpeg") or file.endswith("png") or file.endswith("jpg"):
             path = os.path.join(root, file)
-            # print(path)
-            label = os.path.basename(os.path.dirname(path))
-            known_face_encodings.append(encode(load(path)))
-            known_face_names.append(label)
+            b = os.path.getsize(path)
+            print(b)
+            if b > 70000:
+                label = os.path.basename(os.path.dirname(path))
+                load_1 = load(path)
+                Loaded_encoding = encode(load_1)
+                if Loaded_encoding[0]:
+                    known_face_encodings.append(Loaded_encoding)
+                    known_face_names.append(label)
+                Labels_and_pathes.append(label)
+                Labels_and_pathes.append(root)
 
+                # users.append(('0', label, 'out of office', datetime.datetime.today()))
+print(Labels_and_pathes)
 face_locations = []
 face_encodings = []
 face_names = []
@@ -119,13 +135,13 @@ while True:
             status1 = all_results[0]
             conn.commit()
             if (delta.seconds >= 20) and (status1[0] == "in office"):
-                print(delta.seconds)
+                # print(delta.seconds)
                 cur.execute("DELETE FROM users WHERE name='{}' ;".format(name))
                 conn.commit()
                 num_state = 0
                 user.pop(2)
                 user.insert(2, state[num_state])  # num_state = 1 = in office
-                print(user)
+                # print(user)
 
                 cur.execute("INSERT INTO users(userid, name, status, date) VALUES(?,?,?,?);", user)
                 conn.commit()
@@ -142,16 +158,19 @@ while True:
             cv2.rectangle(frame, (left, bottom - 0), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-    # cv2.imshow('Face Recognition', frame)
+    cv2.imshow('Face Recognition', frame)
+
+
     if cv2.waitKey(33) & 0xFF == ord('0'):
         break
 cap.release()
 cv2.destroyAllWindows()
 
-cur1.execute("SELECT * FROM users;")
-for row in cur1:
-    print('ID: {0} | Name: {1} | Status: {2} | Date: {3}'.format(row[0], row[1], row[2], row[3]))
-one_result = cur1.fetchall()
-print(one_result)
 
-os.system('python3.8 Base_opening.py')
+
+cur.execute("DROP TABLE users;")  # удаление значений из вспомогательной БД
+conn.commit()
+
+
+
+
