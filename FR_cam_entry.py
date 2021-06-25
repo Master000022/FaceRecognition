@@ -157,7 +157,7 @@ while True:
 
             if (delta.seconds >= 15) and (status1[0] == "out of office"):
                 print(delta.seconds)
-                ROI = frame[(top-40):(bottom+40), (left-40):(right+40)]
+                ROI = frame[(top):(bottom), (left):(right)]
                 cv2.imshow("Input", ROI)
                 cv2.imwrite(os.path.join(Labels_and_pathes[direct], '%s_%i.png' % (Labels_and_pathes[direct-1], x)), ROI)
                 x += 1

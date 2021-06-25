@@ -96,7 +96,7 @@ while True:
     ret, frame = cap.read()
     # print(type(frame))
     process_frame = True
-    resized_small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)  # Making frame 1/4 of original, faster processing
+    resized_small_frame = cv2.resize(frame, (0, 0), fx=1, fy=1)  # Making frame 1/4 of original, faster processing
     rgb_small_frame = resized_small_frame[:, :, ::-1]  # Converting BGR to RGB
     x = 0
 
@@ -150,10 +150,10 @@ while True:
                 user.clear()
             # process_frame = not process_frame
         for (top, right, bottom, left), name in zip(face_locations, face_names):
-            top *= 2
-            right *= 2
-            bottom *= 2
-            left *= 2
+            top *= 1
+            right *= 1
+            bottom *= 1
+            left *= 1
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
             cv2.rectangle(frame, (left, bottom - 0), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
@@ -168,8 +168,7 @@ cv2.destroyAllWindows()
 
 
 
-cur.execute("DROP TABLE users;")  # удаление значений из вспомогательной БД
-conn.commit()
+
 
 
 

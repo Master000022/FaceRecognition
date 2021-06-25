@@ -7,8 +7,8 @@ timing = time.time()
 
 os.system("python3 FR_cam_entry.py &")
 os.system("python3 FR_cam_exit.py &")
-while time.time() - timing < 600.0:
-    # timing = time.time()
+while time.time() - timing < 36000.0:
+    timing = time.time()
     # print(time.time() - timing)
     a=1
 
